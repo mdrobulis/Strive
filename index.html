@@ -6,6 +6,11 @@
     <title>Strive - Adlerian Goal Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        .glow-text {
+            text-shadow: 0 0 8px rgba(139, 92, 246, 0.7);
+        }
+    </style>
 </head>
 <body class="bg-gray-900 min-h-screen font-sans text-gray-100">
     <div class="container mx-auto px-4 py-12 max-w-2xl">
@@ -17,7 +22,7 @@
         <main>
             <div class="bg-gray-800 rounded-xl shadow-lg p-6 mb-8 border border-gray-700">
                 <div id="goalContainer">
-                    <h2 id="goalText" class="text-2xl font-bold text-indigo-300 cursor-pointer"></h2>
+                    <h2 id="goalText" class="text-2xl font-bold text-indigo-300 cursor-pointer glow-text"></h2>
                     <input type="text" id="mainGoal" placeholder="What is your life goal?" 
                         class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-lg text-white placeholder-gray-400">
                 </div>
@@ -27,17 +32,27 @@
             <div class="bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-700">
                 <h2 class="text-2xl font-semibold text-indigo-300 mb-4">Your Path</h2>
                 <p class="text-gray-400 mb-4">"Trust only movement. Life happens at the level of events." - Adler</p>
-
-                <div id="newStepContainer" class="mt-6">
+                
+                <!-- Step input moved to top -->
+                <div id="newStepContainer" class="mb-6">
                     <input type="text" id="newStepInput" placeholder="Next step (max 5 uncompleted)" 
                         class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-400">
                 </div>
-                
+
                 <div id="stepsContainer" class="space-y-3">
-                    <!-- Steps will appear here at the top -->
+                    <!-- Active steps will appear here -->
                 </div>
 
-            
+                <!-- Completed tasks summary -->
+                <div id="completedSummary" class="mt-4 pt-4 border-t border-gray-700 hidden">
+                    <button id="toggleCompletedBtn" class="flex items-center text-gray-400 hover:text-indigo-300 text-sm">
+                        <svg id="toggleCompletedIcon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                        <span id="completedCount">0</span> completed tasks
+                    </button>
+                    <div id="completedStepsContainer" class="mt-2 space-y-2 hidden"></div>
+                </div>
             </div>
         </main>
 
@@ -77,90 +92,144 @@
 
         let steps = [];
         const maxUncompleted = 5;
+        const STORAGE_KEY = 'adlerianGoalTrackerData';
 
-        // Initialize goal input
-        document.getElementById('goalText').style.display = 'none';
+        // Initialize app
+        function init() {
+            loadData();
+            setupEventListeners();
+            renderAll();
+        }
 
-        // Main goal input handler
-        document.getElementById('mainGoal').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && this.value.trim()) {
-                saveGoal(this.value.trim());
-            }
-        });
+        function setupEventListeners() {
+            // Main goal input handler
+            document.getElementById('mainGoal').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && this.value.trim()) {
+                    saveGoal(this.value.trim());
+                }
+            });
 
-        // Double-click to edit goal
-        document.getElementById('goalText').addEventListener('dblclick', function() {
-            document.getElementById('mainGoal').value = this.textContent;
-            document.getElementById('mainGoal').style.display = 'block';
-            this.style.display = 'none';
-            document.getElementById('mainGoal').focus();
-        });
+            // Double-click to edit goal
+            document.getElementById('goalText').addEventListener('dblclick', function() {
+                document.getElementById('mainGoal').value = this.textContent;
+                document.getElementById('mainGoal').style.display = 'block';
+                this.style.display = 'none';
+                document.getElementById('mainGoal').focus();
+            });
+
+            // New step input handler
+            document.getElementById('newStepInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && this.value.trim()) {
+                    if (getUncompletedCount() >= maxUncompleted) {
+                        showQuote("Focus on completing existing steps first! (Max 5 uncompleted)");
+                        return;
+                    }
+
+                    addStep(this.value.trim());
+                    this.value = '';
+                    showQuote(getRandomQuote());
+                }
+            });
+
+            // Toggle completed tasks visibility
+            document.getElementById('toggleCompletedBtn').addEventListener('click', function() {
+                const container = document.getElementById('completedStepsContainer');
+                const icon = document.getElementById('toggleCompletedIcon');
+                
+                if (container.classList.contains('hidden')) {
+                    container.classList.remove('hidden');
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />';
+                } else {
+                    container.classList.add('hidden');
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />';
+                }
+            });
+
+            // Close quote modal
+            document.getElementById('closeQuoteBtn').addEventListener('click', function() {
+                document.getElementById('quoteModal').classList.add('hidden');
+            });
+        }
 
         function saveGoal(text) {
             document.getElementById('goalText').textContent = text;
             document.getElementById('goalText').style.display = 'block';
             document.getElementById('mainGoal').style.display = 'none';
             document.getElementById('mainGoal').value = '';
+            saveData();
             showQuote(getRandomQuote());
         }
-
-        // New step input handler
-        document.getElementById('newStepInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && this.value.trim()) {
-                if (getUncompletedCount() >= maxUncompleted) {
-                    showQuote("Focus on completing existing steps first! (Max 5 uncompleted)");
-                    return;
-                }
-
-                addStep(this.value.trim());
-                this.value = '';
-                showQuote(getRandomQuote());
-            }
-        });
 
         function addStep(text) {
             const step = {
                 id: Date.now(),
                 text: text,
-                completed: false
+                completed: false,
+                createdAt: new Date().toISOString()
             };
-            steps.unshift(step); // Add to beginning of array
-            renderSteps();
+            steps.unshift(step);
+            saveData();
+            renderAll();
         }
 
         function toggleStep(id) {
             const step = steps.find(s => s.id === id);
             if (step) {
                 step.completed = !step.completed;
-                renderSteps();
+                saveData();
+                renderAll();
                 showQuote(getRandomQuote());
             }
         }
 
         function deleteStep(id) {
             steps = steps.filter(s => s.id !== id);
-            renderSteps();
+            saveData();
+            renderAll();
         }
 
         function getUncompletedCount() {
             return steps.filter(s => !s.completed).length;
         }
 
+        function getCompletedCount() {
+            return steps.filter(s => s.completed).length;
+        }
+
+        function renderAll() {
+            renderGoal();
+            renderSteps();
+            renderCompletedSummary();
+            updateStepInput();
+        }
+
+        function renderGoal() {
+            const goalText = document.getElementById('goalText').textContent;
+            if (goalText) {
+                document.getElementById('goalText').style.display = 'block';
+                document.getElementById('mainGoal').style.display = 'none';
+            } else {
+                document.getElementById('goalText').style.display = 'none';
+                document.getElementById('mainGoal').style.display = 'block';
+            }
+        }
+
         function renderSteps() {
             const container = document.getElementById('stepsContainer');
             container.innerHTML = '';
 
-            steps.forEach(step => {
+            const uncompletedSteps = steps.filter(s => !s.completed);
+            
+            uncompletedSteps.forEach(step => {
                 const stepEl = document.createElement('div');
-                stepEl.className = `flex items-center p-2 bg-gray-700 rounded-lg ${step.completed ? 'opacity-60' : ''}`;
+                stepEl.className = `flex items-center p-2 bg-gray-700 rounded-lg`;
                 
                 stepEl.innerHTML = `
                     <button class="mr-3 flex-shrink-0" onclick="toggleStep(${step.id})">
-                        <div class="h-5 w-5 rounded-full border-2 ${step.completed ? 'bg-indigo-500 border-indigo-500' : 'border-gray-400'} flex items-center justify-center">
-                            ${step.completed ? '✓' : ''}
+                        <div class="h-5 w-5 rounded-full border-2 border-gray-400 flex items-center justify-center">
                         </div>
                     </button>
-                    <div class="flex-1 ${step.completed ? 'line-through text-gray-400' : 'text-gray-100'}">${step.text}</div>
+                    <div class="flex-1 text-gray-100">${step.text}</div>
                     <button class="ml-2 p-1 text-gray-400 hover:text-red-400" onclick="deleteStep(${step.id})">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -170,8 +239,47 @@
                 
                 container.appendChild(stepEl);
             });
+        }
 
-            // Show/hide input based on uncompleted count
+        function renderCompletedSummary() {
+            const completedCount = getCompletedCount();
+            const summaryContainer = document.getElementById('completedSummary');
+            const completedContainer = document.getElementById('completedStepsContainer');
+            
+            if (completedCount > 0) {
+                summaryContainer.classList.remove('hidden');
+                document.getElementById('completedCount').textContent = completedCount;
+                
+                // Render completed steps
+                completedContainer.innerHTML = '';
+                const completedSteps = steps.filter(s => s.completed);
+                
+                completedSteps.forEach(step => {
+                    const stepEl = document.createElement('div');
+                    stepEl.className = `flex items-center p-2 bg-gray-700 rounded-lg opacity-70`;
+                    
+                    stepEl.innerHTML = `
+                        <button class="mr-3 flex-shrink-0" onclick="toggleStep(${step.id})">
+                            <div class="h-5 w-5 rounded-full bg-indigo-500 border-indigo-500 flex items-center justify-center">
+                                ✓
+                            </div>
+                        </button>
+                        <div class="flex-1 line-through text-gray-400">${step.text}</div>
+                        <button class="ml-2 p-1 text-gray-400 hover:text-red-400" onclick="deleteStep(${step.id})">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    `;
+                    
+                    completedContainer.appendChild(stepEl);
+                });
+            } else {
+                summaryContainer.classList.add('hidden');
+            }
+        }
+
+        function updateStepInput() {
             const inputContainer = document.getElementById('newStepContainer');
             if (getUncompletedCount() >= maxUncompleted) {
                 inputContainer.style.display = 'none';
@@ -179,6 +287,32 @@
                 inputContainer.style.display = 'block';
                 document.getElementById('newStepInput').placeholder = 
                     `Next step (${maxUncompleted - getUncompletedCount()} remaining)`;
+            }
+        }
+
+        // Data persistence
+        function saveData() {
+            const data = {
+                goal: document.getElementById('goalText').textContent,
+                steps: steps
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function loadData() {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    if (data.goal) {
+                        document.getElementById('goalText').textContent = data.goal;
+                    }
+                    if (data.steps) {
+                        steps = data.steps;
+                    }
+                } catch (e) {
+                    console.error("Failed to load saved data", e);
+                }
             }
         }
 
@@ -192,10 +326,8 @@
             return quotes[Math.floor(Math.random() * quotes.length)];
         }
 
-        // Close quote modal
-        document.getElementById('closeQuoteBtn').addEventListener('click', function() {
-            document.getElementById('quoteModal').classList.add('hidden');
-        });
+        // Initialize the app
+        init();
 
         // Expose functions to global scope for HTML onclick
         window.toggleStep = toggleStep;
