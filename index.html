@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adlerian Goal Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+    <div class="container mx-auto px-4 py-12 max-w-2xl">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-indigo-700 mb-2">Adlerian Goal Tracker</h1>
+            <p class="text-gray-600">"To be human means to feel inferior." - Alfred Adler</p>
+        </header>
+
+        <main>
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Your Life Goal</h2>
+                <input type="text" id="mainGoal" placeholder="Enter your main goal here..." 
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-lg">
+                <p class="text-sm text-gray-500 mt-2">This should reflect your style of life and striving for significance</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Action Steps</h2>
+                <p class="text-gray-600 mb-4">"The only normal people are the ones you don't know very well." - Adler</p>
+                
+                <div id="stepsContainer" class="space-y-3">
+                    <!-- Steps will be added here -->
+                </div>
+
+                <button id="addStepBtn" class="mt-4 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition">
+                    + Add Step (up to 5)
+                </button>
+            </div>
+        </main>
+
+        <!-- Quote Modal -->
+        <div id="quoteModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+            <div class="bg-white rounded-xl p-6 max-w-sm mx-4 animate__animated animate__fadeInUp">
+                <div class="text-center">
+                    <h3 class="text-xl font-semibold text-indigo-700 mb-3">Encouragement!</h3>
+                    <p id="quoteText" class="text-gray-700 mb-4 italic">Quote will appear here</p>
+                    <button id="closeQuoteBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                        Continue
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Adlerian quotes
+        const quotes = [
+            "The important thing is not what one is born with, but what use one makes of that equipment.",
+            "It is easier to fight for one's principles than to live up to them.",
+            "Trust only movement. Life happens at the level of events, not of words.",
+            "Follow your heart but take your brain with you.",
+            "The only normal people are the ones you don't know very well.",
+            "To be human means to feel inferior.",
+            "Meanings are not determined by situations, but we determine ourselves by the meanings we give to situations.",
+            "The greater the feeling of inferiority that has been experienced, the more powerful is the urge to conquest.",
+            "Our personal struggles are connected to our social relationships.",
+            "The goal of human development is to move from a felt minus to a perceived plus.",
+            "Courage is not the absence of fear, but the capacity to act despite our fears.",
+            "All problems are interpersonal relationship problems.",
+            "The truth is often a terrible weapon of aggression.",
+            "We cannot think, feel, will, or act without the perception of some goal.",
+            "The style of life is a unity because it has grown out of the difficulties of early life and out of the striving for a goal."
+        ];
+
+        let stepCount = 0;
+        const maxSteps = 5;
+
+        document.getElementById('addStepBtn').addEventListener('click', function() {
+            if (stepCount >= maxSteps) {
+                showQuote("You've reached the maximum number of steps. Focus on completing these first!");
+                return;
+            }
+
+            stepCount++;
+            const stepId = 'step' + stepCount;
+            
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'flex items-center p-3 bg-gray-50 rounded-lg';
+            stepDiv.id = stepId;
+            
+            stepDiv.innerHTML = `
+                <input type="checkbox" id="check${stepCount}" 
+                    class="h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-3 step-checkbox">
+                <input type="text" id="stepInput${stepCount}" placeholder="Enter step ${stepCount}..." 
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500">
+                <button class="ml-2 p-2 text-gray-500 hover:text-red-500 delete-step" data-step="${stepId}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            `;
+            
+            document.getElementById('stepsContainer').appendChild(stepDiv);
+            
+            // Add event listener to checkbox
+            document.getElementById(`check${stepCount}`).addEventListener('change', function(e) {
+                const stepText = document.getElementById(`stepInput${stepCount}`).value;
+                if (e.target.checked) {
+                    showQuote(getRandomQuote());
+                    document.getElementById(`stepInput${stepCount}`).classList.add('line-through', 'text-gray-400');
+                } else {
+                    document.getElementById(`stepInput${stepCount}`).classList.remove('line-through', 'text-gray-400');
+                }
+            });
+            
+            // Add event listener to delete button
+            stepDiv.querySelector('.delete-step').addEventListener('click', function() {
+                document.getElementById('stepsContainer').removeChild(stepDiv);
+                stepCount--;
+            });
+        });
+
+        // Show random Adlerian quote
+        function showQuote(quote) {
+            document.getElementById('quoteText').textContent = quote;
+            document.getElementById('quoteModal').classList.remove('hidden');
+        }
+
+        function getRandomQuote() {
+            return quotes[Math.floor(Math.random() * quotes.length)];
+        }
+
+        // Close quote modal
+        document.getElementById('closeQuoteBtn').addEventListener('click', function() {
+            document.getElementById('quoteModal').classList.add('hidden');
+        });
+    </script>
+</body>
+</html>
