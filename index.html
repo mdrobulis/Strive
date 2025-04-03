@@ -3,67 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Strive - Adlerian Goal Tracker</title>
+    <title>Adlerian Goal Pursuit</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
         .glow-text {
-            text-shadow: 0 0 8px rgba(139, 92, 246, 0.7);
+            text-shadow: 0 0 10px rgba(74, 222, 128, 0.8), 0 0 20px rgba(74, 222, 128, 0.6);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 50%, #4a5568 100%);
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body class="bg-gray-900 min-h-screen font-sans text-gray-100">
-    <div class="container mx-auto px-4 py-12 max-w-2xl">
-        <header class="text-center mb-12">
-            <h1 class="text-4xl font-bold text-indigo-400 mb-2">Strive</h1>
-            <p class="text-gray-400">"To be human means to feel inferior." - Alfred Adler</p>
-        </header>
-
-        <main>
-            <div class="bg-gray-800 rounded-xl shadow-lg p-6 mb-8 border border-gray-700">
-                <div id="goalContainer">
-                    <h2 id="goalText" class="text-2xl font-bold text-indigo-300 cursor-pointer glow-text"></h2>
-                    <input type="text" id="mainGoal" placeholder="What is your life goal?" 
-                        class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-lg text-white placeholder-gray-400">
-                </div>
-                <p class="text-sm text-gray-400 mt-2">Your guiding purpose (press Enter to save)</p>
+<body class="gradient-bg min-h-screen text-gray-100 p-4">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8 text-green-400">Adlerian Goal Pursuit</h1>
+        
+        <!-- Goal Section -->
+        <div class="mb-8">
+            <label for="goal" class="block text-lg font-medium mb-2">Your Primary Goal</label>
+            <div id="goal-display" class="hidden text-5xl font-bold mb-4 text-green-400 glow-text break-words"></div>
+            <input type="text" id="goal" placeholder="Enter your life goal..." 
+                   class="w-full p-4 rounded-lg bg-gray-700 border border-gray-600 focus:border-green-400 focus:ring-1 focus:ring-green-400 text-xl">
+        </div>
+        
+        <!-- Steps Section -->
+        <div class="mb-6">
+            <label for="step" class="block text-lg font-medium mb-2">Next Small Step</label>
+            <div class="flex gap-2">
+                <input type="text" id="step" placeholder="What's your next small step?" 
+                       class="flex-1 p-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-green-400 focus:ring-1 focus:ring-green-400">
+                <button id="add-step" class="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg font-medium">Add</button>
             </div>
-
-            <div class="bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-700">
-                <h2 class="text-2xl font-semibold text-indigo-300 mb-4">Your Path</h2>
-                <p class="text-gray-400 mb-4">"Trust only movement. Life happens at the level of events." - Adler</p>
-                
-                <!-- Step input moved to top -->
-                <div id="newStepContainer" class="mb-6">
-                    <input type="text" id="newStepInput" placeholder="Next step (max 5 uncompleted)" 
-                        class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-400">
-                </div>
-
-                <div id="stepsContainer" class="space-y-3">
-                    <!-- Active steps will appear here -->
-                </div>
-
-                <!-- Completed tasks summary -->
-                <div id="completedSummary" class="mt-4 pt-4 border-t border-gray-700 hidden">
-                    <button id="toggleCompletedBtn" class="flex items-center text-gray-400 hover:text-indigo-300 text-sm">
-                        <svg id="toggleCompletedIcon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                        <span id="completedCount">0</span> completed tasks
-                    </button>
-                    <div id="completedStepsContainer" class="mt-2 space-y-2 hidden"></div>
-                </div>
-            </div>
-        </main>
-
+        </div>
+        
+        <!-- Steps List -->
+        <div id="steps-container" class="space-y-2"></div>
+        
         <!-- Quote Modal -->
-        <div id="quoteModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 hidden z-50">
-            <div class="bg-gray-800 rounded-xl p-6 max-w-sm mx-4 border border-indigo-500 animate__animated animate__fadeInUp">
-                <div class="text-center">
-                    <h3 class="text-xl font-semibold text-indigo-300 mb-3">Encouragement!</h3>
-                    <p id="quoteText" class="text-gray-200 mb-4 italic">Quote will appear here</p>
-                    <button id="closeQuoteBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-                        Continue
+        <div id="quote-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
+            <div class="bg-gray-800 rounded-lg p-6 max-w-md mx-4 border border-green-400">
+                <div id="quote-content" class="text-lg italic mb-4"></div>
+                <div id="quote-author" class="text-right text-green-400 font-medium"></div>
+                <div class="mt-6 flex justify-between">
+                    <button id="close-quote" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg">
+                        Close
                     </button>
                 </div>
             </div>
@@ -71,267 +61,215 @@
     </div>
 
     <script>
-        // Adlerian quotes
-        const quotes = [
-            "The important thing is not what one is born with, but what use one makes of that equipment.",
-            "It is easier to fight for one's principles than to live up to them.",
-            "Trust only movement. Life happens at the level of events, not of words.",
-            "Follow your heart but take your brain with you.",
-            "The only normal people are the ones you don't know very well.",
-            "To be human means to feel inferior.",
-            "Meanings are not determined by situations, but we determine ourselves by the meanings we give to situations.",
-            "The greater the feeling of inferiority that has been experienced, the more powerful is the urge to conquest.",
-            "Our personal struggles are connected to our social relationships.",
-            "The goal of human development is to move from a felt minus to a perceived plus.",
-            "Courage is not the absence of fear, but the capacity to act despite our fears.",
-            "All problems are interpersonal relationship problems.",
-            "The truth is often a terrible weapon of aggression.",
-            "We cannot think, feel, will, or act without the perception of some goal.",
-            "The style of life is a unity because it has grown out of the difficulties of early life and out of the striving for a goal."
+        // Adler quotes
+        const adlerQuotes = [
+            {text: "The only normal people are the ones you don't know very well.", author: "Alfred Adler"},
+            {text: "Follow your heart but take your brain with you.", author: "Alfred Adler"},
+            {text: "Trust only movement. Life happens at the level of events, not of words.", author: "Alfred Adler"},
+            {text: "It is easier to fight for one's principles than to live up to them.", author: "Alfred Adler"},
+            {text: "The chief danger in life is that you may take too many precautions.", author: "Alfred Adler"},
+            {text: "To be a human being means to possess a feeling of inferiority which constantly presses towards its own conquest.", author: "Alfred Adler"},
+            {text: "Meanings are not determined by situations, but we determine ourselves by the meanings we give to situations.", author: "Alfred Adler"},
+            {text: "The important thing is not what one is born with, but what use one makes of that equipment.", author: "Alfred Adler"},
+            {text: "Overcoming difficulties leads to courage, self-respect, and knowing yourself.", author: "Alfred Adler"},
+            {text: "The goal is to transform our inferiority feelings into a striving for superiority that benefits others as well as ourselves.", author: "Alfred Adler"},
+            {text: "The science of the mind can only have for its proper goal the understanding of human nature by every human being.", author: "Alfred Adler"},
+            {text: "We cannot say that if a child is badly nourished he will become a criminal. We must see what conclusion the child has drawn.", author: "Alfred Adler"},
+            {text: "The truth is often a terrible weapon of aggression. It is possible to lie, and even to murder, with the truth.", author: "Alfred Adler"},
+            {text: "No experience is a cause of success or failure. We do not suffer from the shock of our experiences, but we make out of them just what suits our purposes.", author: "Alfred Adler"},
+            {text: "The individual's pattern of life is a unity because it has grown out of the difficulties of early life and out of the striving for a goal.", author: "Alfred Adler"},
+            {text: "The striving for significance, this sense of yearning, always points out to us that all psychological phenomena contain a movement that starts from a feeling of inferiority and reach upward.", author: "Alfred Adler"},
+            {text: "The greater the feeling of inferiority that has been experienced, the more powerful is the urge to conquest and the more violent the emotional agitation.", author: "Alfred Adler"},
+            {text: "To all those who walk the path of human cooperation war must appear loathsome and inhuman.", author: "Alfred Adler"},
+            {text: "Our modern states are preparing to destroy each other; hence the feelings of insecurity and the sense of inferiority in the individual.", author: "Alfred Adler"},
+            {text: "The educator must believe in the potential power of his pupil, and he must employ all his art in seeking to bring his pupil to experience this power.", author: "Alfred Adler"}
         ];
 
-        let steps = [];
-        const maxUncompleted = 5;
-        const STORAGE_KEY = 'adlerianGoalTrackerData';
+        // App state
+        const state = {
+            goal: '',
+            steps: []
+        };
 
-        // Initialize app
-        function init() {
-            loadData();
-            setupEventListeners();
-            renderAll();
-        }
-
-        function setupEventListeners() {
-            // Main goal input handler
-            document.getElementById('mainGoal').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' && this.value.trim()) {
-                    saveGoal(this.value.trim());
-                }
-            });
-
-            // Double-click to edit goal
-            document.getElementById('goalText').addEventListener('dblclick', function() {
-                document.getElementById('mainGoal').value = this.textContent;
-                document.getElementById('mainGoal').style.display = 'block';
-                this.style.display = 'none';
-                document.getElementById('mainGoal').focus();
-            });
-
-            // New step input handler
-            document.getElementById('newStepInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' && this.value.trim()) {
-                    if (getUncompletedCount() >= maxUncompleted) {
-                        showQuote("Focus on completing existing steps first! (Max 5 uncompleted)");
-                        return;
-                    }
-
-                    addStep(this.value.trim());
-                    this.value = '';
-                    showQuote(getRandomQuote());
-                }
-            });
-
-            // Toggle completed tasks visibility
-            document.getElementById('toggleCompletedBtn').addEventListener('click', function() {
-                const container = document.getElementById('completedStepsContainer');
-                const icon = document.getElementById('toggleCompletedIcon');
-                
-                if (container.classList.contains('hidden')) {
-                    container.classList.remove('hidden');
-                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />';
-                } else {
-                    container.classList.add('hidden');
-                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />';
-                }
-            });
-
-            // Close quote modal
-            document.getElementById('closeQuoteBtn').addEventListener('click', function() {
-                document.getElementById('quoteModal').classList.add('hidden');
-            });
-        }
-
-        function saveGoal(text) {
-            document.getElementById('goalText').textContent = text;
-            document.getElementById('goalText').style.display = 'block';
-            document.getElementById('mainGoal').style.display = 'none';
-            document.getElementById('mainGoal').value = '';
-            saveData();
-            showQuote(getRandomQuote());
-        }
-
-        function addStep(text) {
-            const step = {
-                id: Date.now(),
-                text: text,
-                completed: false,
-                createdAt: new Date().toISOString()
-            };
-            steps.unshift(step);
-            saveData();
-            renderAll();
-        }
-
-        function toggleStep(id) {
-            const step = steps.find(s => s.id === id);
-            if (step) {
-                step.completed = !step.completed;
-                saveData();
-                renderAll();
-                showQuote(getRandomQuote());
-            }
-        }
-
-        function deleteStep(id) {
-            steps = steps.filter(s => s.id !== id);
-            saveData();
-            renderAll();
-        }
-
-        function getUncompletedCount() {
-            return steps.filter(s => !s.completed).length;
-        }
-
-        function getCompletedCount() {
-            return steps.filter(s => s.completed).length;
-        }
-
-        function renderAll() {
-            renderGoal();
-            renderSteps();
-            renderCompletedSummary();
-            updateStepInput();
-        }
-
-        function renderGoal() {
-            const goalText = document.getElementById('goalText').textContent;
-            if (goalText) {
-                document.getElementById('goalText').style.display = 'block';
-                document.getElementById('mainGoal').style.display = 'none';
-            } else {
-                document.getElementById('goalText').style.display = 'none';
-                document.getElementById('mainGoal').style.display = 'block';
-            }
-        }
-
-        function renderSteps() {
-            const container = document.getElementById('stepsContainer');
-            container.innerHTML = '';
-
-            const uncompletedSteps = steps.filter(s => !s.completed);
-            
-            uncompletedSteps.forEach(step => {
-                const stepEl = document.createElement('div');
-                stepEl.className = `flex items-center p-2 bg-gray-700 rounded-lg`;
-                
-                stepEl.innerHTML = `
-                    <button class="mr-3 flex-shrink-0" onclick="toggleStep(${step.id})">
-                        <div class="h-5 w-5 rounded-full border-2 border-gray-400 flex items-center justify-center">
-                        </div>
-                    </button>
-                    <div class="flex-1 text-gray-100">${step.text}</div>
-                    <button class="ml-2 p-1 text-gray-400 hover:text-red-400" onclick="deleteStep(${step.id})">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
-                `;
-                
-                container.appendChild(stepEl);
-            });
-        }
-
-        function renderCompletedSummary() {
-            const completedCount = getCompletedCount();
-            const summaryContainer = document.getElementById('completedSummary');
-            const completedContainer = document.getElementById('completedStepsContainer');
-            
-            if (completedCount > 0) {
-                summaryContainer.classList.remove('hidden');
-                document.getElementById('completedCount').textContent = completedCount;
-                
-                // Render completed steps
-                completedContainer.innerHTML = '';
-                const completedSteps = steps.filter(s => s.completed);
-                
-                completedSteps.forEach(step => {
-                    const stepEl = document.createElement('div');
-                    stepEl.className = `flex items-center p-2 bg-gray-700 rounded-lg opacity-70`;
-                    
-                    stepEl.innerHTML = `
-                        <button class="mr-3 flex-shrink-0" onclick="toggleStep(${step.id})">
-                            <div class="h-5 w-5 rounded-full bg-indigo-500 border-indigo-500 flex items-center justify-center">
-                                ✓
-                            </div>
-                        </button>
-                        <div class="flex-1 line-through text-gray-400">${step.text}</div>
-                        <button class="ml-2 p-1 text-gray-400 hover:text-red-400" onclick="deleteStep(${step.id})">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                        </button>
-                    `;
-                    
-                    completedContainer.appendChild(stepEl);
-                });
-            } else {
-                summaryContainer.classList.add('hidden');
-            }
-        }
-
-        function updateStepInput() {
-            const inputContainer = document.getElementById('newStepContainer');
-            if (getUncompletedCount() >= maxUncompleted) {
-                inputContainer.style.display = 'none';
-            } else {
-                inputContainer.style.display = 'block';
-                document.getElementById('newStepInput').placeholder = 
-                    `Next step (${maxUncompleted - getUncompletedCount()} remaining)`;
-            }
-        }
-
-        // Data persistence
-        function saveData() {
-            const data = {
-                goal: document.getElementById('goalText').textContent,
-                steps: steps
-            };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        }
-
-        function loadData() {
-            const savedData = localStorage.getItem(STORAGE_KEY);
-            if (savedData) {
-                try {
-                    const data = JSON.parse(savedData);
-                    if (data.goal) {
-                        document.getElementById('goalText').textContent = data.goal;
-                    }
-                    if (data.steps) {
-                        steps = data.steps;
-                    }
-                } catch (e) {
-                    console.error("Failed to load saved data", e);
-                }
-            }
-        }
-
-        // Show random Adlerian quote
-        function showQuote(quote) {
-            document.getElementById('quoteText').textContent = quote;
-            document.getElementById('quoteModal').classList.remove('hidden');
-        }
-
-        function getRandomQuote() {
-            return quotes[Math.floor(Math.random() * quotes.length)];
-        }
+        // DOM elements
+        const goalInput = document.getElementById('goal');
+        const goalDisplay = document.getElementById('goal-display');
+        const stepInput = document.getElementById('step');
+        const addStepBtn = document.getElementById('add-step');
+        const stepsContainer = document.getElementById('steps-container');
+        const quoteModal = document.getElementById('quote-modal');
+        const quoteContent = document.getElementById('quote-content');
+        const quoteAuthor = document.getElementById('quote-author');
+        const closeQuoteBtn = document.getElementById('close-quote');
 
         // Initialize the app
-        init();
+        function init() {
+            loadState();
+            renderGoal();
+            renderSteps();
+            
+            // Event listeners
+            goalInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    saveGoal();
+                }
+            });
+            
+            goalInput.addEventListener('blur', saveGoal);
+            
+            addStepBtn.addEventListener('click', addStep);
+            stepInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addStep();
+                }
+            });
+            
+            closeQuoteBtn.addEventListener('click', hideQuote);
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !quoteModal.classList.contains('hidden')) {
+                    hideQuote();
+                }
+            });
+        }
 
-        // Expose functions to global scope for HTML onclick
-        window.toggleStep = toggleStep;
-        window.deleteStep = deleteStep;
+        // Load state from localStorage
+        function loadState() {
+            const savedState = localStorage.getItem('adlerianGoalApp');
+            if (savedState) {
+                Object.assign(state, JSON.parse(savedState));
+            }
+        }
+
+        // Save state to localStorage
+        function saveState() {
+            localStorage.setItem('adlerianGoalApp', JSON.stringify(state));
+        }
+
+        // Save goal
+        function saveGoal() {
+            state.goal = goalInput.value.trim();
+            if (state.goal) {
+                goalDisplay.textContent = state.goal;
+                goalDisplay.classList.remove('hidden');
+                goalInput.classList.add('hidden');
+                saveState();
+            }
+        }
+
+        // Render goal
+        function renderGoal() {
+            if (state.goal) {
+                goalDisplay.textContent = state.goal;
+                goalDisplay.classList.remove('hidden');
+                goalInput.classList.add('hidden');
+                goalInput.value = state.goal;
+            } else {
+                goalDisplay.classList.add('hidden');
+                goalInput.classList.remove('hidden');
+            }
+        }
+
+        // Add step
+        function addStep() {
+            const stepText = stepInput.value.trim();
+            if (!stepText) return;
+            
+            if (state.steps.filter(step => !step.completed).length >= 5) {
+                alert("You can have maximum 5 uncompleted steps at a time. Complete or remove some first.");
+                return;
+            }
+            
+            // Add to beginning of array (top of list)
+            state.steps.unshift({
+                text: stepText,
+                completed: false,
+                id: Date.now()
+            });
+            
+            stepInput.value = '';
+            saveState();
+            renderSteps();
+            showRandomQuote();
+        }
+
+        // Toggle step completion
+        function toggleStepCompletion(id) {
+            const step = state.steps.find(step => step.id === id);
+            if (step) {
+                step.completed = !step.completed;
+                saveState();
+                renderSteps();
+                if (step.completed) {
+                    showRandomQuote();
+                }
+            }
+        }
+
+        // Remove step
+        function removeStep(id) {
+            state.steps = state.steps.filter(step => step.id !== id);
+            saveState();
+            renderSteps();
+        }
+
+        // Render steps
+        function renderSteps() {
+            stepsContainer.innerHTML = '';
+            
+            if (state.steps.length === 0) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.className = 'text-center py-4 text-gray-400';
+                emptyMsg.textContent = 'No steps added yet. Add your first small step above!';
+                stepsContainer.appendChild(emptyMsg);
+                return;
+            }
+            
+            state.steps.forEach(step => {
+                const stepEl = document.createElement('div');
+                stepEl.className = `bg-gray-700 p-3 rounded-lg flex items-center fade-in ${step.completed ? 'opacity-70' : ''}`;
+                
+                // Checkbox
+                const checkbox = document.createElement('div');
+                checkbox.className = `w-6 h-6 rounded-md border-2 mr-3 flex-shrink-0 cursor-pointer transition-colors ${step.completed ? 'bg-green-500 border-green-500' : 'border-gray-400 hover:border-green-400'}`;
+                checkbox.innerHTML = step.completed ? '✓' : '';
+                checkbox.addEventListener('click', () => toggleStepCompletion(step.id));
+                
+                // Text
+                const text = document.createElement('div');
+                text.className = `flex-1 ${step.completed ? 'line-through text-gray-400' : ''}`;
+                text.textContent = step.text;
+                
+                // Remove button
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'ml-2 text-gray-400 hover:text-red-400';
+                removeBtn.innerHTML = '&times;';
+                removeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    removeStep(step.id);
+                });
+                
+                stepEl.appendChild(checkbox);
+                stepEl.appendChild(text);
+                stepEl.appendChild(removeBtn);
+                stepsContainer.appendChild(stepEl);
+            });
+        }
+
+        // Show random quote
+        function showRandomQuote() {
+            const quote = adlerQuotes[Math.floor(Math.random() * adlerQuotes.length)];
+            quoteContent.textContent = `"${quote.text}"`;
+            quoteAuthor.textContent = `— ${quote.author}`;
+            quoteModal.classList.remove('hidden');
+        }
+
+        // Hide quote modal
+        function hideQuote() {
+            quoteModal.classList.add('hidden');
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
