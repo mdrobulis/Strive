@@ -66,28 +66,56 @@
 
     <script>
         // Adler quotes
+
         const adlerQuotes = [
-            {text: "The only normal people are the ones you don't know very well.", author: "Alfred Adler"},
-            {text: "Follow your heart but take your brain with you.", author: "Alfred Adler"},
-            {text: "Trust only movement. Life happens at the level of events, not of words.", author: "Alfred Adler"},
-            {text: "It is easier to fight for one's principles than to live up to them.", author: "Alfred Adler"},
-            {text: "The chief danger in life is that you may take too many precautions.", author: "Alfred Adler"},
-            {text: "To be a human being means to possess a feeling of inferiority which constantly presses towards its own conquest.", author: "Alfred Adler"},
-            {text: "Meanings are not determined by situations, but we determine ourselves by the meanings we give to situations.", author: "Alfred Adler"},
-            {text: "The important thing is not what one is born with, but what use one makes of that equipment.", author: "Alfred Adler"},
-            {text: "Overcoming difficulties leads to courage, self-respect, and knowing yourself.", author: "Alfred Adler"},
-            {text: "The goal is to transform our inferiority feelings into a striving for superiority that benefits others as well as ourselves.", author: "Alfred Adler"},
-            {text: "The science of the mind can only have for its proper goal the understanding of human nature by every human being.", author: "Alfred Adler"},
-            {text: "We cannot say that if a child is badly nourished he will become a criminal. We must see what conclusion the child has drawn.", author: "Alfred Adler"},
-            {text: "The truth is often a terrible weapon of aggression. It is possible to lie, and even to murder, with the truth.", author: "Alfred Adler"},
-            {text: "No experience is a cause of success or failure. We do not suffer from the shock of our experiences, but we make out of them just what suits our purposes.", author: "Alfred Adler"},
-            {text: "The individual's pattern of life is a unity because it has grown out of the difficulties of early life and out of the striving for a goal.", author: "Alfred Adler"},
-            {text: "The striving for significance, this sense of yearning, always points out to us that all psychological phenomena contain a movement that starts from a feeling of inferiority and reach upward.", author: "Alfred Adler"},
-            {text: "The greater the feeling of inferiority that has been experienced, the more powerful is the urge to conquest and the more violent the emotional agitation.", author: "Alfred Adler"},
-            {text: "To all those who walk the path of human cooperation war must appear loathsome and inhuman.", author: "Alfred Adler"},
-            {text: "Our modern states are preparing to destroy each other; hence the feelings of insecurity and the sense of inferiority in the individual.", author: "Alfred Adler"},
-            {text: "The educator must believe in the potential power of his pupil, and he must employ all his art in seeking to bring his pupil to experience this power.", author: "Alfred Adler"}
-        ];
+    // Alfred Adler Quotes
+    {text: "The only normal people are the ones you don't know very well.", author: "Alfred Adler"},
+    {text: "Follow your heart but take your brain with you.", author: "Alfred Adler"},
+    {text: "Trust only movement. Life happens at the level of events, not of words.", author: "Alfred Adler"},
+    {text: "The chief danger in life is that you may take too many precautions.", author: "Alfred Adler"},
+    {text: "To be a human being means to possess a feeling of inferiority which constantly presses towards its own conquest.", author: "Alfred Adler"},
+    {text: "Overcoming difficulties leads to courage, self-respect, and knowing yourself.", author: "Alfred Adler"},
+    {text: "The goal is to transform our inferiority feelings into a striving for superiority that benefits others as well as ourselves.", author: "Alfred Adler"},
+    {text: "No experience is a cause of success or failure. We do not suffer from the shock of our experiences, but we make out of them just what suits our purposes.", author: "Alfred Adler"},
+    
+    // Rudolf Dreikurs (Adler's student and colleague)
+    {text: "Encouragement is to psychological growth what water is to a plant.", author: "Rudolf Dreikurs"},
+    {text: "A child needs encouragement like a plant needs water.", author: "Rudolf Dreikurs"},
+    {text: "The courage to be imperfect is the first step toward self-improvement.", author: "Rudolf Dreikurs"},
+    {text: "Mistakes are wonderful opportunities to learn.", author: "Rudolf Dreikurs"},
+    
+    // Henry Stein (Adlerian scholar)
+    {text: "Adlerian psychology is a psychology of use, not possession.", author: "Henry Stein"},
+    {text: "The meaning we give to events determines our movement through life.", author: "Henry Stein"},
+    
+    // Other Adler-Inspired Encouragement Quotes
+    {text: "Small steps in the right direction can turn out to be the biggest steps of your life.", author: "Adlerian Principle"},
+    {text: "You are not determined by your circumstances, but by the meaning you give them.", author: "Adlerian Principle"},
+    {text: "Every day is a new opportunity to change your narrative.", author: "Adlerian Principle"},
+    {text: "Growth begins when we start to accept our own imperfections.", author: "Adlerian Principle"},
+    {text: "The path to significance is through contribution to others.", author: "Adlerian Principle"},
+    
+    // General Encouragement (Adlerian-aligned)
+    {text: "Progress is more important than perfection.", author: "Adlerian Saying"},
+    {text: "What matters is not what you're born with, but what you do with what you have.", author: "Adlerian Saying"},
+    {text: "Courage doesn't mean you don't get afraid. Courage means you don't let fear stop you.", author: "Adlerian Saying"},
+    {text: "You're always deciding - consciously or unconsciously - how to respond to life's challenges.", author: "Adlerian Saying"},
+    {text: "The moment you take responsibility for your life is the moment you gain power to change it.", author: "Adlerian Saying"},
+    
+    // Famous Quotes Aligned with Adler's Philosophy
+    {text: "Whether you think you can or you think you can't, you're right.", author: "Henry Ford"},
+    {text: "Our greatest glory is not in never falling, but in rising every time we fall.", author: "Confucius"},
+    {text: "The purpose of life is not to be happy. It is to be useful, to be honorable, to be compassionate, to have it make some difference that you have lived and lived well.", author: "Ralph Waldo Emerson"},
+    {text: "You miss 100% of the shots you don't take.", author: "Wayne Gretzky"},
+    {text: "The only limit to our realization of tomorrow will be our doubts of today.", author: "Franklin D. Roosevelt"},
+    
+    // Modern Adlerian-Inspired Encouragement
+    {text: "Every small step forward is a victory worth celebrating.", author: "Modern Adlerian"},
+    {text: "Your worth isn't determined by your achievements, but by your courage to keep growing.", author: "Modern Adlerian"},
+    {text: "The obstacles in your path become the way forward when you change your perspective.", author: "Modern Adlerian"},
+    {text: "Today's effort is tomorrow's strength.", author: "Modern Adlerian"},
+    {text: "You're not stuck where you are unless you decide to be.", author: "Modern Adlerian"}
+];
 
         // App state
         const state = {
