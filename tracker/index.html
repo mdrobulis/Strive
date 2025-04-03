@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Run Tracker Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.css">
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        #map {
+            height: 40vh;
+        }
+        .chart-container {
+            height: 25vh;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-6 max-w-3xl">
+        <h1 class="text-3xl font-bold text-center text-blue-800 mb-6">Run Tracker Pro</h1>
+        
+        <!-- Status Card -->
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+            <div id="status" class="text-xl font-semibold text-center text-gray-800">Ready to start your run</div>
+            <div id="stats" class="text-lg text-center text-gray-600 mt-2">
+                <span class="font-medium">Speed:</span> <span id="currentSpeed">0</span> km/h | 
+                <span class="font-medium">Avg:</span> <span id="avgSpeed">0</span> km/h | 
+                <span class="font-medium">Pace:</span> <span id="currentPace">0:00</span>/km | 
+                <span class="font-medium">Distance:</span> <span id="distance">0</span> km | 
+                <span class="font-medium">Time:</span> <span id="duration">00:00:00</span>
+            </div>
+        </div>
+        
+        <!-- Map -->
+        <div id="map" class="rounded-lg shadow-md mb-6"></div>
+        
+        <!-- Controls -->
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6 grid grid-cols-2 md:grid-cols-5 gap-2">
+            <button id="startBtn" class="bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-md font-medium transition">
+                Start Run
+            </button>
+            <button id="pauseBtn" disabled class="bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-4 rounded-md font-medium transition">
+                Pause
+            </button>
+            <button id="resumeBtn" disabled class="bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-md font-medium transition">
+                Resume
+            </button>
+            <button id="stopBtn" disabled class="bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-md font-medium transition">
+                Stop
+            </button>
+            <button id="downloadBtn" disabled class="bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-md font-medium transition">
+                Download Data
+            </button>
+        </div>
+        
+        <!-- Pace Chart -->
+        <div class="bg-white rounded-lg shadow-md p-4">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Pace Over Time (min/km)</h2>
+            <div class="chart-container">
+                <canvas id="paceChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => console.log('SW registered:', registration))
+                    .catch(err => console.log('SW registration failed:', err));
+            });
+        }
+    </script>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
