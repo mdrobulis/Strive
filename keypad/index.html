@@ -3,77 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skaitmeninė One-Time Pad Generatorius</title>
+    <title>Vienkartinis Rakto Generatorius</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @page {
-            size: A4;
-            margin: 0;
-        }
         @media print {
-            body {
-                padding: 20px;
-                font-size: 12pt;
-            }
-            .no-print {
-                display: none;
-            }
-            .key-pad {
-                page-break-after: always;
-            }
+            .no-print { display: none; }
+            body { padding: 0; font-size: 12pt; }
+            .key-page { page-break-after: always; margin: 0; }
+        }
+        .cheat-sheet {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .cheat-item {
+            border: 1px solid #e2e8f0;
+            padding: 4px;
+            text-align: center;
+            border-radius: 4px;
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen p-6 font-sans">
-    <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-6">
-        <h1 class="text-2xl font-bold text-gray-800 mb-4">Skaitmeninė One-Time Pad Generatorius</h1>
-        
+<body class="bg-gray-50 p-4 md:p-8 max-w-4xl mx-auto">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">Vienkartinis Rakto Generatorius</h1>
+        <p class="text-gray-600 mb-6">Slaptas susirašinėjimas naudojant vienkartinius raktus</p>
+
         <!-- Instructions in Lithuanian -->
-        <div class="mb-6 p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
-            <h2 class="text-lg font-bold text-blue-800 mb-2">Naudojimo instrukcija</h2>
-            <ol class="list-decimal pl-5 space-y-2 text-sm">
-                <li><strong>Generuokite naują rakto lentelę</strong> kiekvienam susirašinėjimui</li>
-                <li><strong>Spausdinkite</strong> ir saugokite fizinę kopiją saugioje vietoje</li>
-                <li><strong>Paskirstykite</strong> identiškas kopijas abiem susirašinėjimo šalims</li>
-                <li><strong>Užšifruokite</strong> pridedami pranešimo skaitmenis prie rakto skaitmenų (mod 10):
-                    <div class="bg-white p-2 rounded mt-1 font-mono text-xs">
-                        Pranešimas: 1 2 3 4 5<br>
-                        Raktas: 6 8 3 9 0<br>
-                        Šifras: (1+6)=7, (2+8)=0, (3+3)=6, (4+9)=3, (5+0)=5 → 7 0 6 3 5
-                    </div>
-                </li>
-                <li><strong>Iššifruokite</strong> atimdami rakto skaitmenis (mod 10)</li>
-                <li><strong>Sunaikinkite</strong> panaudotus raktus nedelsiant</li>
-                <li><strong>Niekada nenaudokite</strong> to paties rakto du kartus</li>
-            </ol>
-        </div>
-
-        <!-- Controls -->
-        <div class="no-print mb-6 p-4 bg-gray-50 rounded">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Lentelių skaičius</label>
-                    <input type="number" id="padCount" min="1" max="10" value="1" class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Eilučių per lentelę</label>
-                    <input type="number" id="linesPerPad" min="5" max="50" value="10" class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Grupės dydis</label>
-                    <input type="number" id="groupSize" min="3" max="10" value="5" class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                </div>
+        <div class="mb-8 p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
+            <h2 class="text-lg font-bold text-blue-800 mb-3">Naudojimo instrukcija</h2>
+            <div class="space-y-3 text-sm">
+                <p><strong>1. Generavimas:</strong> Paspauskite „Generuoti raktus“ norimam puslapių kiekiui.</p>
+                <p><strong>2. Spausdinimas:</strong> Naudokite „Spausdinti“ mygtuką fizinei kopijai.</p>
+                <p><strong>3. Šifravimas:</strong></p>
+                <ul class="list-disc pl-5 ml-2">
+                    <li>Konvertuokite raidę į skaičių pagal lentelę</li>
+                    <li>Pridėkite rakto skaičių prie pranešimo skaičiaus (mod 100)</li>
+                    <li>Pvz.: H(07) + rakto sk. 68 = 75</li>
+                </ul>
+                <p><strong>4. Dešifravimas:</strong> Atimkite rakto skaičių (mod 100).</p>
+                <p class="text-red-600 font-medium">▶ Niekada nenaudokite rakto daugiau nei vieną kartą!</p>
             </div>
-            <button id="generateBtn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 mr-2">
-                Generuoti raktus
-            </button>
-            <button id="printBtn" class="bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300">
-                Spausdinti
-            </button>
         </div>
 
-        <!-- Generated Key Pads -->
-        <div id="keyPadsContainer"></div>
+        <!-- Cheat Sheet -->
+        <div class="mb-8">
+            <h2 class="text-lg font-bold text-gray-800 mb-3">Simbolių lentelė</h2>
+            <div class="cheat-sheet mb-4">
+                <!-- A-Z -->
+                <div class="cheat-item font-mono">A: 00</div>
+                <div class="cheat-item font-mono">B: 01</div>
+                <div class="cheat-item font-mono">C: 02</div>
+                <div class="cheat-item font-mono">D: 03</div>
+                <div class="cheat-item font-mono">E: 04</div>
+                <div class="cheat-item font-mono">F: 05</div>
+                <div class="cheat-item font-mono">G: 06</div>
+                <div class="cheat-item font-mono">H: 07</div>
+                <div class="cheat-item font-mono">I: 08</div>
+                <div class="cheat-item font-mono">J: 09</div>
+                <div class="cheat-item font-mono">K: 10</div>
+                <div class="cheat-item font-mono">L: 11</div>
+                <div class="cheat-item font-mono">M: 12</div>
+                <div class="cheat-item font-mono">N: 13</div>
+                <div class="cheat-item font-mono">O: 14</div>
+                <div class="cheat-item font-mono">P: 15</div>
+                <div class="cheat-item font-mono">Q: 16</div>
+                <div class="cheat-item font-mono">R: 17</div>
+                <div class="cheat-item font-mono">S: 18</div>
+                <div class="cheat-item font-mono">T: 19</div>
+                <div class="cheat-item font-mono">U: 20</div>
+                <div class="cheat-item font-mono">V: 21</div>
+                <div class="cheat-item font-mono">W: 22</div>
+                <div class="cheat-item font-mono">X: 23</div>
+                <div class="cheat-item font-mono">Y: 24</div>
+                <div class="cheat-item font-mono">Z: 25</div>
+                <!-- Specials -->
+                <div class="cheat-item font-mono">Tarpas: 26</div>
+                <div class="cheat-item font-mono">.: 27</div>
+                <div class="cheat-item font-mono">,: 28</div>
+                <div class="cheat-item font-mono">!: 29</div>
+                <div class="cheat-item font-mono">?: 30</div>
+                <!-- Numbers -->
+                <div class="cheat-item font-mono">0: 31</div>
+                <div class="cheat-item font-mono">1: 32</div>
+                <div class="cheat-item font-mono">2: 33</div>
+                <div class="cheat-item font-mono">3: 34</div>
+                <div class="cheat-item font-mono">4: 35</div>
+                <div class="cheat-item font-mono">5: 36</div>
+                <div class="cheat-item font-mono">6: 37</div>
+                <div class="cheat-item font-mono">7: 38</div>
+                <div class="cheat-item font-mono">8: 39</div>
+                <div class="cheat-item font-mono">9: 40</div>
+            </div>
+            <p class="text-sm text-gray-600">* Kontroliniai kodai: 88 (pradžia), 99 (pabaiga), 77 (klaida)</p>
+        </div>
+
+        <!-- Key Generator -->
+        <div class="no-print mb-6 p-4 bg-gray-50 rounded-lg">
+            <h2 class="text-lg font-bold text-gray-800 mb-3">Raktų generatorius</h2>
+            <div class="flex flex-wrap gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Puslapių skaičius</label>
+                    <input type="number" id="pageCount" min="1" max="10" value="1" 
+                           class="w-20 px-3 py-2 border border-gray-300 rounded-md">
+                </div>
+                <button id="generateBtn" 
+                        class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 self-end">
+                    Generuoti raktus
+                </button>
+                <button id="printBtn" 
+                        class="bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300 self-end">
+                    Spausdinti
+                </button>
+            </div>
+        </div>
+
+        <!-- Generated Key Pages -->
+        <div id="keyPagesContainer"></div>
     </div>
 
     <script>
@@ -88,64 +134,52 @@
             return key;
         }
 
-        // Format key into groups
-        function formatKey(key, groupSize) {
-            let formatted = '';
-            for (let i = 0; i < key.length; i += groupSize) {
-                formatted += key.substr(i, groupSize) + ' ';
-            }
-            return formatted.trim();
-        }
-
-        // Generate complete key pad
-        function generateKeyPad(lines, groupSize, groupsPerLine = 4) {
-            const digitsPerLine = groupSize * groupsPerLine;
-            let pad = '';
-            for (let i = 0; i < lines; i++) {
-                const lineKey = generateRandomDigits(digitsPerLine);
-                pad += formatKey(lineKey, groupSize) + '\n';
-            }
-            return pad;
-        }
-
-        // Generate and display key pads
-        function generateKeyPads() {
-            const padCount = parseInt(document.getElementById('padCount').value);
-            const linesPerPad = parseInt(document.getElementById('linesPerPad').value);
-            const groupSize = parseInt(document.getElementById('groupSize').value);
+        // Generate a single key page (10 lines × 4 groups of 5 digits)
+        function generateKeyPage(pageNumber) {
+            let pageHTML = `
+                <div class="key-page bg-white p-4 mb-6 border border-gray-200 rounded">
+                    <h3 class="font-bold mb-2">Vienkartinis raktas #${pageNumber}</h3>
+                    <div class="font-mono text-sm leading-loose">
+            `;
             
-            let container = document.getElementById('keyPadsContainer');
+            // 10 lines per page
+            for (let line = 1; line <= 10; line++) {
+                // 4 groups of 5 digits
+                let lineContent = '';
+                for (let group = 0; group < 4; group++) {
+                    lineContent += generateRandomDigits(5) + ' ';
+                }
+                pageHTML += lineContent.trim() + '<br>';
+            }
+            
+            pageHTML += `
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2 border-t pt-2">
+                        NAUDOTI TIK KARTĄ • SUNAIKINTI PO NAUDOJIMO • ${new Date().toLocaleDateString()}
+                    </p>
+                </div>
+            `;
+            
+            return pageHTML;
+        }
+
+        // Generate all key pages
+        function generateAllPages() {
+            const pageCount = parseInt(document.getElementById('pageCount').value) || 1;
+            const container = document.getElementById('keyPagesContainer');
             container.innerHTML = '';
             
-            for (let i = 0; i < padCount; i++) {
-                const padDiv = document.createElement('div');
-                padDiv.className = 'key-pad mb-8 p-4 border border-gray-200 rounded bg-white';
-                
-                const title = document.createElement('h3');
-                title.className = 'font-bold text-lg mb-2';
-                title.textContent = `One-Time Pad #${i+1} (${new Date().toLocaleDateString()})`;
-                padDiv.appendChild(title);
-                
-                const pre = document.createElement('pre');
-                pre.className = 'font-mono text-sm whitespace-pre-wrap';
-                pre.textContent = generateKeyPad(linesPerPad, groupSize);
-                padDiv.appendChild(pre);
-                
-                const footer = document.createElement('div');
-                footer.className = 'text-xs text-gray-500 mt-2 border-t pt-2';
-                footer.textContent = 'NAUDOTI TIK KARTĄ • SAUGOTI UŽRAKINTA • SUNAIKINTI PO NAUDOJIMO';
-                padDiv.appendChild(footer);
-                
-                container.appendChild(padDiv);
+            for (let i = 1; i <= pageCount; i++) {
+                container.innerHTML += generateKeyPage(i);
             }
         }
 
         // Event listeners
-        document.getElementById('generateBtn').addEventListener('click', generateKeyPads);
+        document.getElementById('generateBtn').addEventListener('click', generateAllPages);
         document.getElementById('printBtn').addEventListener('click', () => window.print());
 
-        // Generate initial pad
-        generateKeyPads();
+        // Generate initial page
+        generateAllPages();
     </script>
 </body>
 </html>
