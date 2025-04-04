@@ -29,22 +29,58 @@
         <h1 class="text-2xl font-bold text-gray-800 mb-2">Vienkartinis Rakto Generatorius</h1>
         <p class="text-gray-600 mb-6">Slaptas susirašinėjimas naudojant vienkartinius raktus</p>
 
-        <!-- Instructions in Lithuanian -->
-        <div class="mb-8 p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
-            <h2 class="text-lg font-bold text-blue-800 mb-3">Naudojimo instrukcija</h2>
-            <div class="space-y-3 text-sm">
-                <p><strong>1. Generavimas:</strong> Paspauskite „Generuoti raktus“ norimam puslapių kiekiui.</p>
-                <p><strong>2. Spausdinimas:</strong> Naudokite „Spausdinti“ mygtuką fizinei kopijai.</p>
-                <p><strong>3. Šifravimas:</strong></p>
-                <ul class="list-disc pl-5 ml-2">
-                    <li>Konvertuokite raidę į skaičių pagal lentelę</li>
-                    <li>Pridėkite rakto skaičių prie pranešimo skaičiaus (mod 100)</li>
-                    <li>Pvz.: H(07) + rakto sk. 68 = 75</li>
-                </ul>
-                <p><strong>4. Dešifravimas:</strong> Atimkite rakto skaičių (mod 100).</p>
-                <p class="text-red-600 font-medium">▶ Niekada nenaudokite rakto daugiau nei vieną kartą!</p>
-            </div>
+        <!-- Updated Instruction Section -->
+<div class="mb-8 p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
+    <h2 class="text-lg font-bold text-blue-800 mb-3">Kaip naudotis? (Žingsnis po žingsnio)</h2>
+    <div class="space-y-4 text-sm">
+        <!-- Encryption -->
+        <div class="bg-white p-3 rounded shadow-sm">
+            <h3 class="font-bold mb-2 text-blue-700">▼ Šifravimas (siunčiant žinutę):</h3>
+            <ol class="list-decimal pl-5 space-y-2">
+                <li><strong>Pasirinkite rakto eilutę</strong> iš sąsiuvinio</li>
+                <li><strong>Konvertuokite raides į skaičius</strong> pagal lentelę:
+                    <div class="bg-gray-50 p-2 mt-1 rounded font-mono text-xs">
+                        PAVYZDYS: "SLAPTA 123" →<br>
+                        S(18) L(11) A(00) P(15) T(19) A(00) [Tarpas(26)] 1(32) 2(33) 3(34)
+                    </div>
+                </li>
+                <li><strong>Sudėkite su rakto skaičiais</strong> (naudokite paskutinius 2 skaitmenis):
+                    <div class="bg-gray-50 p-2 mt-1 rounded font-mono text-xs">
+                        Žinutė: 18 11 00 15 19 00 26 32 33 34<br>
+                        Raktas: 72941 83056 14293 65701 → 72 94 18 30 56 14 29 36 57 01<br>
+                        Šifras: (18+72)=90, (11+94)=05, (00+18)=18... → 90 05 18 45 75 14 55 68 90 35
+                    </div>
+                </li>
+            </ol>
         </div>
+
+        <!-- Decryption -->
+        <div class="bg-white p-3 rounded shadow-sm">
+            <h3 class="font-bold mb-2 text-green-700">▼ Dešifravimas (gavus žinutę):</h3>
+            <ol class="list-decimal pl-5 space-y-2">
+                <li><strong>Naudokite tą pačią rakto eilutę</strong></li>
+                <li><strong>Atimkite rakto skaičius</strong> iš šifro (jei rezultatas neigiamas, pridėkite 100):
+                    <div class="bg-gray-50 p-2 mt-1 rounded font-mono text-xs">
+                        Šifras: 90 05 18 45 75 14 55 68 90 35<br>
+                        Raktas: 72 94 18 30 56 14 29 36 57 01<br>
+                        Žinutė: (90-72)=18(S), (05-94)=11(L), ... → "SLAPTA 123"
+                    </div>
+                </li>
+            </ol>
+        </div>
+
+        <!-- Golden Rules -->
+        <div class="bg-yellow-50 p-3 rounded border border-yellow-200">
+            <h3 class="font-bold mb-2 text-red-600">❗ SVARBIAUSIOS Taisyklės:</h3>
+            <ul class="list-disc pl-5 space-y-1">
+                <li>Vienas raktas = viena žinutė (niekada nepakartokite)</li>
+                <li>Raktą sunaikinkite degdami/sutrinti po naudojimo</li>
+                <li>Jei rakto per mažai - SIŲSKITE TRUMPESNĘ žinutę</li>
+                <li>Saugokite rakto sąsiuvinį užrakintame dėžėje</li>
+            </ul>
+        </div>
+    </div>
+</div>
 
         <!-- Cheat Sheet -->
         <div class="mb-8">
