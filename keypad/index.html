@@ -1,116 +1,151 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="lt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Numeric One-Time Pad Key Generator</title>
+    <title>Skaitmeninė One-Time Pad Generatorius</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        @media print {
+            body {
+                padding: 20px;
+                font-size: 12pt;
+            }
+            .no-print {
+                display: none;
+            }
+            .key-pad {
+                page-break-after: always;
+            }
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen p-6">
-    <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
-        <h1 class="text-2xl font-bold text-gray-800 mb-4">🔢 Numeric One-Time Pad Key Generator</h1>
+<body class="bg-gray-100 min-h-screen p-6 font-sans">
+    <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-6">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">Skaitmeninė One-Time Pad Generatorius</h1>
         
-        <!-- Key Length Selection -->
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Key Length</label>
-            <select id="keyLength" class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                <option value="20">20 digits (short message)</option>
-                <option value="50" selected>50 digits</option>
-                <option value="100">100 digits</option>
-                <option value="custom">Custom length...</option>
-            </select>
-            <div id="customLengthContainer" class="mt-2 hidden">
-                <input type="number" id="customLength" min="10" max="1000" placeholder="Enter digits (10-1000)" class="w-full px-3 py-2 border border-gray-300 rounded-md">
-            </div>
+        <!-- Instructions in Lithuanian -->
+        <div class="mb-6 p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
+            <h2 class="text-lg font-bold text-blue-800 mb-2">Naudojimo instrukcija</h2>
+            <ol class="list-decimal pl-5 space-y-2 text-sm">
+                <li><strong>Generuokite naują rakto lentelę</strong> kiekvienam susirašinėjimui</li>
+                <li><strong>Spausdinkite</strong> ir saugokite fizinę kopiją saugioje vietoje</li>
+                <li><strong>Paskirstykite</strong> identiškas kopijas abiem susirašinėjimo šalims</li>
+                <li><strong>Užšifruokite</strong> pridedami pranešimo skaitmenis prie rakto skaitmenų (mod 10):
+                    <div class="bg-white p-2 rounded mt-1 font-mono text-xs">
+                        Pranešimas: 1 2 3 4 5<br>
+                        Raktas: 6 8 3 9 0<br>
+                        Šifras: (1+6)=7, (2+8)=0, (3+3)=6, (4+9)=3, (5+0)=5 → 7 0 6 3 5
+                    </div>
+                </li>
+                <li><strong>Iššifruokite</strong> atimdami rakto skaitmenis (mod 10)</li>
+                <li><strong>Sunaikinkite</strong> panaudotus raktus nedelsiant</li>
+                <li><strong>Niekada nenaudokite</strong> to paties rakto du kartus</li>
+            </ol>
         </div>
 
-        <!-- Generated Key -->
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Generated Key</label>
-            <div id="keyOutput" class="p-3 bg-gray-50 rounded-md font-mono whitespace-pre-wrap break-all min-h-12"></div>
-            <div class="mt-2 flex flex-wrap gap-2">
-                <button id="generateBtn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-                    Generate New Key
-                </button>
-                <button id="copyBtn" class="bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300">
-                    Copy Key
-                </button>
-                <button id="downloadBtn" class="bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300">
-                    Download Key
-                </button>
+        <!-- Controls -->
+        <div class="no-print mb-6 p-4 bg-gray-50 rounded">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Lentelių skaičius</label>
+                    <input type="number" id="padCount" min="1" max="10" value="1" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Eilučių per lentelę</label>
+                    <input type="number" id="linesPerPad" min="5" max="50" value="10" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Grupės dydis</label>
+                    <input type="number" id="groupSize" min="3" max="10" value="5" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                </div>
             </div>
+            <button id="generateBtn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 mr-2">
+                Generuoti raktus
+            </button>
+            <button id="printBtn" class="bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300">
+                Spausdinti
+            </button>
         </div>
 
-        <!-- Security Warning -->
-        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded-md">
-            <p class="text-yellow-700 text-sm">
-                <strong>⚠️ Security Notice:</strong>  
-                - Never reuse keys.  
-                - Store keys securely (e.g., encrypted USB).  
-                - Destroy after use.
-            </p>
-        </div>
+        <!-- Generated Key Pads -->
+        <div id="keyPadsContainer"></div>
     </div>
 
     <script>
         // Generate cryptographically secure random digits (0-9)
         function generateRandomDigits(length) {
             const numbers = new Uint8Array(length);
-            crypto.getRandomValues(numbers); // Secure RNG
+            crypto.getRandomValues(numbers);
             let key = '';
             for (let i = 0; i < length; i++) {
-                key += numbers[i] % 10; // Convert to single digit (0-9)
+                key += numbers[i] % 10;
             }
             return key;
         }
 
-        // Update UI
-        function updateKeyDisplay() {
-            const keyLengthSelect = document.getElementById('keyLength');
-            const customLengthInput = document.getElementById('customLength');
-            let length;
-            
-            if (keyLengthSelect.value === 'custom') {
-                length = parseInt(customLengthInput.value) || 50;
-                if (length < 10) length = 10;
-                if (length > 1000) length = 1000;
-            } else {
-                length = parseInt(keyLengthSelect.value);
+        // Format key into groups
+        function formatKey(key, groupSize) {
+            let formatted = '';
+            for (let i = 0; i < key.length; i += groupSize) {
+                formatted += key.substr(i, groupSize) + ' ';
             }
-            
-            const key = generateRandomDigits(length);
-            document.getElementById('keyOutput').textContent = key;
+            return formatted.trim();
         }
 
-        // Event Listeners
-        document.getElementById('generateBtn').addEventListener('click', updateKeyDisplay);
-        
-        document.getElementById('copyBtn').addEventListener('click', () => {
-            const key = document.getElementById('keyOutput').textContent;
-            navigator.clipboard.writeText(key).then(() => {
-                alert('Key copied to clipboard!');
-            });
-        });
-        
-        document.getElementById('downloadBtn').addEventListener('click', () => {
-            const key = document.getElementById('keyOutput').textContent;
-            const blob = new Blob([key], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `otp-key-${new Date().toISOString().slice(0,10)}.txt`;
-            a.click();
-            URL.revokeObjectURL(url);
-        });
+        // Generate complete key pad
+        function generateKeyPad(lines, groupSize, groupsPerLine = 4) {
+            const digitsPerLine = groupSize * groupsPerLine;
+            let pad = '';
+            for (let i = 0; i < lines; i++) {
+                const lineKey = generateRandomDigits(digitsPerLine);
+                pad += formatKey(lineKey, groupSize) + '\n';
+            }
+            return pad;
+        }
 
-        // Toggle custom length input
-        document.getElementById('keyLength').addEventListener('change', (e) => {
-            const customContainer = document.getElementById('customLengthContainer');
-            customContainer.classList.toggle('hidden', e.target.value !== 'custom');
-        });
+        // Generate and display key pads
+        function generateKeyPads() {
+            const padCount = parseInt(document.getElementById('padCount').value);
+            const linesPerPad = parseInt(document.getElementById('linesPerPad').value);
+            const groupSize = parseInt(document.getElementById('groupSize').value);
+            
+            let container = document.getElementById('keyPadsContainer');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < padCount; i++) {
+                const padDiv = document.createElement('div');
+                padDiv.className = 'key-pad mb-8 p-4 border border-gray-200 rounded bg-white';
+                
+                const title = document.createElement('h3');
+                title.className = 'font-bold text-lg mb-2';
+                title.textContent = `One-Time Pad #${i+1} (${new Date().toLocaleDateString()})`;
+                padDiv.appendChild(title);
+                
+                const pre = document.createElement('pre');
+                pre.className = 'font-mono text-sm whitespace-pre-wrap';
+                pre.textContent = generateKeyPad(linesPerPad, groupSize);
+                padDiv.appendChild(pre);
+                
+                const footer = document.createElement('div');
+                footer.className = 'text-xs text-gray-500 mt-2 border-t pt-2';
+                footer.textContent = 'NAUDOTI TIK KARTĄ • SAUGOTI UŽRAKINTA • SUNAIKINTI PO NAUDOJIMO';
+                padDiv.appendChild(footer);
+                
+                container.appendChild(padDiv);
+            }
+        }
 
-        // Generate initial key
-        updateKeyDisplay();
+        // Event listeners
+        document.getElementById('generateBtn').addEventListener('click', generateKeyPads);
+        document.getElementById('printBtn').addEventListener('click', () => window.print());
+
+        // Generate initial pad
+        generateKeyPads();
     </script>
 </body>
 </html>
