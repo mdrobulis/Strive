@@ -3,169 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>One-Time Pad Generator</title>
+    <title>Numeric One-Time Pad Key Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen p-6">
-    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
-        <h1 class="text-2xl font-bold text-gray-800 mb-6">One-Time Pad Generator</h1>
+    <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">🔢 Numeric One-Time Pad Key Generator</h1>
         
-        <div class="mb-6">
-            <label for="message" class="block text-sm font-medium text-gray-700 mb-2">Message to Encrypt/Decrypt</label>
-            <textarea id="message" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Enter your message here"></textarea>
+        <!-- Key Length Selection -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Key Length</label>
+            <select id="keyLength" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                <option value="20">20 digits (short message)</option>
+                <option value="50" selected>50 digits</option>
+                <option value="100">100 digits</option>
+                <option value="custom">Custom length...</option>
+            </select>
+            <div id="customLengthContainer" class="mt-2 hidden">
+                <input type="number" id="customLength" min="10" max="1000" placeholder="Enter digits (10-1000)" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+            </div>
         </div>
-        
-        <div class="mb-6">
-            <label for="key" class="block text-sm font-medium text-gray-700 mb-2">Generated One-Time Pad Key</label>
-            <textarea id="key" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" readonly></textarea>
-            <button id="generateKey" class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                Generate Random Key
-            </button>
-        </div>
-        
-        <div class="mb-6">
-            <label for="result" class="block text-sm font-medium text-gray-700 mb-2">Result</label>
-            <textarea id="result" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" readonly></textarea>
-            <div class="mt-2 flex space-x-2">
-                <button id="encrypt" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                    Encrypt
+
+        <!-- Generated Key -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Generated Key</label>
+            <div id="keyOutput" class="p-3 bg-gray-50 rounded-md font-mono whitespace-pre-wrap break-all min-h-12"></div>
+            <div class="mt-2 flex flex-wrap gap-2">
+                <button id="generateBtn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                    Generate New Key
                 </button>
-                <button id="decrypt" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Decrypt
+                <button id="copyBtn" class="bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300">
+                    Copy Key
+                </button>
+                <button id="downloadBtn" class="bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300">
+                    Download Key
                 </button>
             </div>
         </div>
-        
-        <div class="mb-6">
-            <h2 class="text-lg font-medium text-gray-800 mb-2">Character to Number Mapping</h2>
-            <div id="mapping" class="bg-gray-50 p-4 rounded-md overflow-auto max-h-40">
-                <!-- Mapping will be displayed here -->
-            </div>
+
+        <!-- Security Warning -->
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded-md">
+            <p class="text-yellow-700 text-sm">
+                <strong>⚠️ Security Notice:</strong>  
+                - Never reuse keys.  
+                - Store keys securely (e.g., encrypted USB).  
+                - Destroy after use.
+            </p>
         </div>
     </div>
 
     <script>
-        // Character to number mapping (A-Z, a-z, 0-9, space, and common punctuation)
-        const charMap = {};
-        let currentCode = 0;
-        
-        // Add uppercase letters
-        for (let i = 65; i <= 90; i++) {
-            charMap[String.fromCharCode(i)] = currentCode++;
-        }
-        
-        // Add lowercase letters
-        for (let i = 97; i <= 122; i++) {
-            charMap[String.fromCharCode(i)] = currentCode++;
-        }
-        
-        // Add numbers
-        for (let i = 48; i <= 57; i++) {
-            charMap[String.fromCharCode(i)] = currentCode++;
-        }
-        
-        // Add space and common punctuation
-        charMap[' '] = currentCode++;
-        charMap[','] = currentCode++;
-        charMap['.'] = currentCode++;
-        charMap['!'] = currentCode++;
-        charMap['?'] = currentCode++;
-        
-        // Display the mapping
-        function displayMapping() {
-            const mappingContainer = document.getElementById('mapping');
-            mappingContainer.innerHTML = '';
-            
-            const sortedChars = Object.keys(charMap).sort((a, b) => charMap[a] - charMap[b]);
-            
-            sortedChars.forEach(char => {
-                const displayChar = char === ' ' ? 'Space' : char;
-                const charElement = document.createElement('div');
-                charElement.className = 'inline-block bg-white p-2 m-1 rounded shadow-sm border border-gray-200';
-                charElement.textContent = `${displayChar}: ${charMap[char]}`;
-                mappingContainer.appendChild(charElement);
-            });
-        }
-        
-        // Generate random key
-        function generateRandomKey(length) {
-            const chars = Object.keys(charMap);
+        // Generate cryptographically secure random digits (0-9)
+        function generateRandomDigits(length) {
+            const numbers = new Uint8Array(length);
+            crypto.getRandomValues(numbers); // Secure RNG
             let key = '';
-            
             for (let i = 0; i < length; i++) {
-                const randomIndex = Math.floor(Math.random() * chars.length);
-                key += chars[randomIndex];
+                key += numbers[i] % 10; // Convert to single digit (0-9)
             }
-            
             return key;
         }
-        
-        // One-time pad encryption/decryption
-        function processText(encrypt = true) {
-            const message = document.getElementById('message').value;
-            const key = document.getElementById('key').value;
+
+        // Update UI
+        function updateKeyDisplay() {
+            const keyLengthSelect = document.getElementById('keyLength');
+            const customLengthInput = document.getElementById('customLength');
+            let length;
             
-            if (message.length === 0 || key.length === 0) {
-                alert('Please enter both message and key');
-                return;
+            if (keyLengthSelect.value === 'custom') {
+                length = parseInt(customLengthInput.value) || 50;
+                if (length < 10) length = 10;
+                if (length > 1000) length = 1000;
+            } else {
+                length = parseInt(keyLengthSelect.value);
             }
             
-            if (key.length < message.length) {
-                alert('Key must be at least as long as the message');
-                return;
-            }
-            
-            let result = '';
-            
-            for (let i = 0; i < message.length; i++) {
-                const messageChar = message[i];
-                const keyChar = key[i];
-                
-                if (!(messageChar in charMap) || !(keyChar in charMap)) {
-                    result += '?'; // Character not in mapping
-                    continue;
-                }
-                
-                const messageCode = charMap[messageChar];
-                const keyCode = charMap[keyChar];
-                
-                let resultCode;
-                if (encrypt) {
-                    resultCode = (messageCode + keyCode) % currentCode;
-                } else {
-                    resultCode = (messageCode - keyCode + currentCode) % currentCode;
-                }
-                
-                // Find character for resultCode
-                const resultChar = Object.keys(charMap).find(char => charMap[char] === resultCode);
-                result += resultChar || '?';
-            }
-            
-            document.getElementById('result').value = result;
+            const key = generateRandomDigits(length);
+            document.getElementById('keyOutput').textContent = key;
         }
+
+        // Event Listeners
+        document.getElementById('generateBtn').addEventListener('click', updateKeyDisplay);
         
-        // Event listeners
-        document.getElementById('generateKey').addEventListener('click', () => {
-            const message = document.getElementById('message').value;
-            if (message.length === 0) {
-                alert('Please enter a message first');
-                return;
-            }
-            
-            const key = generateRandomKey(message.length);
-            document.getElementById('key').value = key;
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            const key = document.getElementById('keyOutput').textContent;
+            navigator.clipboard.writeText(key).then(() => {
+                alert('Key copied to clipboard!');
+            });
         });
         
-        document.getElementById('encrypt').addEventListener('click', () => {
-            processText(true);
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            const key = document.getElementById('keyOutput').textContent;
+            const blob = new Blob([key], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `otp-key-${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
         });
-        
-        document.getElementById('decrypt').addEventListener('click', () => {
-            processText(false);
+
+        // Toggle custom length input
+        document.getElementById('keyLength').addEventListener('change', (e) => {
+            const customContainer = document.getElementById('customLengthContainer');
+            customContainer.classList.toggle('hidden', e.target.value !== 'custom');
         });
-        
-        // Initialize
-        displayMapping();
+
+        // Generate initial key
+        updateKeyDisplay();
     </script>
 </body>
 </html>
