@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strive - Adlerian Goal Pursuit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* ... (existing styles remain the same) ... */
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-gray-100 p-4">
+    <div class="max-w-2xl mx-auto">
+        <div class="flex justify-end gap-2 mb-4">
+            <button onclick="changeLanguage('en')" class="px-3 py-1 text-sm bg-green-600 hover:bg-green-500 rounded-lg transition-colors">EN</button>
+            <button onclick="changeLanguage('ru')" class="px-3 py-1 text-sm bg-green-600 hover:bg-green-500 rounded-lg transition-colors">RU</button>
+            <button onclick="changeLanguage('lt')" class="px-3 py-1 text-sm bg-green-600 hover:bg-green-500 rounded-lg transition-colors">LT</button>
+        </div>
+        <h1 id="app-title" class="text-3xl font-bold text-center mb-8 text-green-400">Strive 4 more</h1>
+        
+        <!-- ... (rest of the HTML remains the same until script section) ... -->
+
+    <script>
+        // Translations object
+        const translations = {
+            en: {
+                ui: {
+                    title: "Strive 4 more",
+                    goalLabel: "Your Primary Goal",
+                    goalPlaceholder: "Enter your life goal...",
+                    stepLabel: "Next Small Step",
+                    stepPlaceholder: "What's your next small step?",
+                    addButton: "Add",
+                    noSteps: "No steps added yet. Add your first small step above!",
+                    closeQuote: "Close"
+                },
+                quotes: [
+                    {text: "The only normal people are the ones you don't know very well.", author: "Alfred Adler"},
+                    // ... (rest of original English quotes)
+                ]
+            },
+            ru: {
+                ui: {
+                    title: "Стремись к большему",
+                    goalLabel: "Ваша главная цель",
+                    goalPlaceholder: "Введите свою жизненную цель...",
+                    stepLabel: "Следующий маленький шаг",
+                    stepPlaceholder: "Какой ваш следующий маленький шаг?",
+                    addButton: "Добавить",
+                    noSteps: "Шагов пока нет. Добавьте свой первый маленький шаг!",
+                    closeQuote: "Закрыть"
+                },
+                quotes: [
+                    {text: "Единственные нормальные люди - это те, кого вы не знаете очень хорошо.", author: "Альфред Адлер"},
+                    // ... (Russian translations of quotes)
+                ]
+            },
+            lt: {
+                ui: {
+                    title: "Siek daugiau",
+                    goalLabel: "Jūsų pagrindinis tikslas",
+                    goalPlaceholder: "Įveskite savo gyvenimo tikslą...",
+                    stepLabel: "Kitas mažas žingsnis",
+                    stepPlaceholder: "Koks tavo kitas mažas žingsnis?",
+                    addButton: "Pridėti",
+                    noSteps: "Dar nėra pridėtų žingsnių. Pridėkite pirmąjį!",
+                    closeQuote: "Uždaryti"
+                },
+                quotes: [
+                    {text: "Vieninteliai normalūs žmonės yra tie, kurių labai gerai nepažįstate.", author: "Alfredas Adleris"},
+                    // ... (Lithuanian translations of quotes)
+                ]
+            }
+        };
+
+        let adlerQuotes = translations.en.quotes; // Initialize with English quotes
+
+        // App state
+        const state = {
+            goal: '',
+            steps: [],
+            lang: 'en'
+        };
+
+        // DOM elements
+        const goalInput = document.getElementById('goal');
+        const goalDisplay = document.getElementById('goal-display');
+        const stepInput = document.getElementById('step');
+        const addStepBtn = document.getElementById('add-step');
+        const stepsContainer = document.getElementById('steps-container');
+        const quoteModal = document.getElementById('quote-modal');
+        const quoteContent = document.getElementById('quote-content');
+        const quoteAuthor = document.getElementById('quote-author');
+        const closeQuoteBtn = document.getElementById('close-quote');
+        const appTitle = document.getElementById('app-title');
+
+        // Language functions
+        function changeLanguage(lang) {
+            state.lang = lang;
+            adlerQuotes = translations[lang].quotes;
+            applyTranslations();
+            saveState();
+        }
+
+        function applyTranslations() {
+            const t = translations[state.lang].ui;
+            
+            // Update UI elements
+            appTitle.textContent = t.title;
+            document.querySelector('label[for="goal"]').textContent = t.goalLabel;
+            goalInput.placeholder = t.goalPlaceholder;
+            document.querySelector('label[for="step"]').textContent = t.stepLabel;
+            stepInput.placeholder = t.stepPlaceholder;
+            addStepBtn.textContent = t.addButton;
+            closeQuoteBtn.textContent = t.closeQuote;
+            
+            // Re-render components with translated text
+            renderSteps();
+        }
+
+        // Modified renderSteps function
+        function renderSteps() {
+            stepsContainer.innerHTML = '';
+            
+            if (state.steps.length === 0) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.className = 'text-center py-4 text-gray-400';
+                emptyMsg.textContent = translations[state.lang].ui.noSteps;
+                stepsContainer.appendChild(emptyMsg);
+                return;
+            }
+            
+            // ... (rest of renderSteps remains the same)
+        }
+
+        // Modified init function
+        function init() {
+            loadState();
+            applyTranslations(); // Apply translations after loading state
+            renderGoal();
+            renderSteps();
+            
+            // ... (rest of init remains the same)
+        }
+
+        // ... (rest of the JavaScript code remains the same)
+
+    </script>
+</body>
+</html>
