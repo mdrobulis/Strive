@@ -6,80 +6,128 @@
     <title>Strive - Adlerian Goal Pursuit</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* ... (existing styles remain the same) ... */
+        .glow-text {
+            text-shadow: 0 0 10px rgba(74, 222, 128, 0.8), 0 0 20px rgba(74, 222, 128, 0.6);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .goal-edit {
+            background: rgba(74, 222, 128, 0.1);
+            border-bottom: 2px solid rgba(74, 222, 128, 0.5);
+        }
     </style>
 </head>
 <body class="gradient-bg min-h-screen text-gray-100 p-4">
     <div class="max-w-2xl mx-auto">
-        <div class="flex justify-end gap-2 mb-4">
-            <button onclick="changeLanguage('en')" class="px-3 py-1 text-sm bg-green-600 hover:bg-green-500 rounded-lg transition-colors">EN</button>
-            <button onclick="changeLanguage('ru')" class="px-3 py-1 text-sm bg-green-600 hover:bg-green-500 rounded-lg transition-colors">RU</button>
-            <button onclick="changeLanguage('lt')" class="px-3 py-1 text-sm bg-green-600 hover:bg-green-500 rounded-lg transition-colors">LT</button>
-        </div>
-        <h1 id="app-title" class="text-3xl font-bold text-center mb-8 text-green-400">Strive 4 more</h1>
+        <h1 class="text-3xl font-bold text-center mb-8 text-green-400">Strive 4 more</h1>
         
-        <!-- ... (rest of the HTML remains the same until script section) ... -->
+        <!-- Language Selector -->
+        <div class="flex justify-center gap-2 mb-8">
+            <button data-lang="en" class="lang-btn px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg">English</button>
+            <button data-lang="ru" class="lang-btn px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg">Русский</button>
+            <button data-lang="lt" class="lang-btn px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg">Lietuvių</button>
+        </div>
+
+        <!-- Goal Section -->
+        <div class="mb-8">
+            <label id="goal-label" for="goal" class="block text-lg font-medium mb-2">Your Primary Goal</label>
+            <div id="goal-display" class="hidden text-5xl font-bold mb-4 text-green-400 glow-text break-words cursor-pointer hover:goal-edit transition-all duration-200"></div>
+            <input type="text" id="goal" placeholder="Enter your life goal..." 
+                   class="w-full p-4 rounded-lg bg-gray-700 border border-gray-600 focus:border-green-400 focus:ring-1 focus:ring-green-400 text-xl">
+        </div>
+        
+        <!-- Steps Section -->
+        <div class="mb-6">
+            <label id="step-label" for="step" class="block text-lg font-medium mb-2">Next Small Step</label>
+            <div class="flex gap-2">
+                <input type="text" id="step" placeholder="What's your next small step?" 
+                       class="flex-1 p-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-green-400 focus:ring-1 focus:ring-green-400">
+                <button id="add-step" class="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg font-medium">Add</button>
+            </div>
+        </div>
+        
+        <!-- Steps List -->
+        <div id="steps-container" class="space-y-2"></div>
+        
+        <!-- Quote Modal -->
+        <div id="quote-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
+            <div class="bg-gray-800 rounded-lg p-6 max-w-md mx-4 border border-green-400">
+                <div id="quote-content" class="text-lg italic mb-4"></div>
+                <div id="quote-author" class="text-right text-green-400 font-medium"></div>
+                <div class="mt-6 flex justify-between">
+                    <button id="close-quote" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // Translations object
+        // Translations
         const translations = {
             en: {
-                ui: {
-                    title: "Strive 4 more",
-                    goalLabel: "Your Primary Goal",
-                    goalPlaceholder: "Enter your life goal...",
-                    stepLabel: "Next Small Step",
-                    stepPlaceholder: "What's your next small step?",
-                    addButton: "Add",
-                    noSteps: "No steps added yet. Add your first small step above!",
-                    closeQuote: "Close"
-                },
+                goalLabel: "Your Primary Goal",
+                goalPlaceholder: "Enter your life goal...",
+                stepLabel: "Next Small Step",
+                stepPlaceholder: "What's your next small step?",
+                addButton: "Add",
+                noStepsMessage: "No steps added yet. Add your first small step above!",
+                closeButton: "Close",
+                maxStepsAlert: "You can have maximum 5 uncompleted steps at a time. Complete or remove some first.",
                 quotes: [
                     {text: "The only normal people are the ones you don't know very well.", author: "Alfred Adler"},
-                    // ... (rest of original English quotes)
+                    {text: "Follow your heart but take your brain with you.", author: "Alfred Adler"},
+                    // ... keep all original English quotes
                 ]
             },
             ru: {
-                ui: {
-                    title: "Стремись к большему",
-                    goalLabel: "Ваша главная цель",
-                    goalPlaceholder: "Введите свою жизненную цель...",
-                    stepLabel: "Следующий маленький шаг",
-                    stepPlaceholder: "Какой ваш следующий маленький шаг?",
-                    addButton: "Добавить",
-                    noSteps: "Шагов пока нет. Добавьте свой первый маленький шаг!",
-                    closeQuote: "Закрыть"
-                },
+                goalLabel: "Ваша основная цель",
+                goalPlaceholder: "Введите свою жизненную цель...",
+                stepLabel: "Следующий маленький шаг",
+                stepPlaceholder: "Какой ваш следующий маленький шаг?",
+                addButton: "Добавить",
+                noStepsMessage: "Шаги еще не добавлены. Добавьте свой первый маленький шаг!",
+                closeButton: "Закрыть",
+                maxStepsAlert: "Максимум 5 незавершенных шагов. Завершите или удалите некоторые.",
                 quotes: [
-                    {text: "Единственные нормальные люди - это те, кого вы не знаете очень хорошо.", author: "Альфред Адлер"},
-                    // ... (Russian translations of quotes)
+                    {text: "Единственные нормальные люди — это те, кого вы не знаете очень хорошо.", author: "Альфред Адлер"},
+                    {text: "Следуй за своим сердцем, но возьми с собой мозг.", author: "Альфред Адлер"},
+                    // ... add Russian translated quotes
                 ]
             },
             lt: {
-                ui: {
-                    title: "Siek daugiau",
-                    goalLabel: "Jūsų pagrindinis tikslas",
-                    goalPlaceholder: "Įveskite savo gyvenimo tikslą...",
-                    stepLabel: "Kitas mažas žingsnis",
-                    stepPlaceholder: "Koks tavo kitas mažas žingsnis?",
-                    addButton: "Pridėti",
-                    noSteps: "Dar nėra pridėtų žingsnių. Pridėkite pirmąjį!",
-                    closeQuote: "Uždaryti"
-                },
+                goalLabel: "Jūsų pagrindinis tikslas",
+                goalPlaceholder: "Įveskite savo gyvenimo tikslą...",
+                stepLabel: "Kitas mažas žingsnis",
+                stepPlaceholder: "Koks jūsų kitas mažas žingsnis?",
+                addButton: "Pridėti",
+                noStepsMessage: "Dar nepridėta jokių žingsnių. Pridėkite pirmąjį mažą žingsnį!",
+                closeButton: "Uždaryti",
+                maxStepsAlert: "Daugiausia galite turėti 5 neužbaigtus žingsnius. Pirmiausia užbaikite arba pašalinkite.",
                 quotes: [
                     {text: "Vieninteliai normalūs žmonės yra tie, kurių labai gerai nepažįstate.", author: "Alfredas Adleris"},
-                    // ... (Lithuanian translations of quotes)
+                    {text: "Sekite savo širdimi, bet pasiimkite ir protą.", author: "Alfredas Adleris"},
+                    // ... add Lithuanian translated quotes
                 ]
             }
         };
 
-        let adlerQuotes = translations.en.quotes; // Initialize with English quotes
+        let currentLang = 'en';
+        let currentQuotes = translations[currentLang].quotes;
 
         // App state
         const state = {
             goal: '',
-            steps: [],
-            lang: 'en'
+            steps: []
         };
 
         // DOM elements
@@ -92,30 +140,65 @@
         const quoteContent = document.getElementById('quote-content');
         const quoteAuthor = document.getElementById('quote-author');
         const closeQuoteBtn = document.getElementById('close-quote');
-        const appTitle = document.getElementById('app-title');
 
-        // Language functions
-        function changeLanguage(lang) {
-            state.lang = lang;
-            adlerQuotes = translations[lang].quotes;
-            applyTranslations();
-            saveState();
-        }
-
-        function applyTranslations() {
-            const t = translations[state.lang].ui;
+        function updateLanguage(lang) {
+            currentLang = lang;
+            currentQuotes = translations[lang].quotes;
             
             // Update UI elements
-            appTitle.textContent = t.title;
-            document.querySelector('label[for="goal"]').textContent = t.goalLabel;
-            goalInput.placeholder = t.goalPlaceholder;
-            document.querySelector('label[for="step"]').textContent = t.stepLabel;
-            stepInput.placeholder = t.stepPlaceholder;
-            addStepBtn.textContent = t.addButton;
-            closeQuoteBtn.textContent = t.closeQuote;
+            document.getElementById('goal-label').textContent = translations[lang].goalLabel;
+            goalInput.placeholder = translations[lang].goalPlaceholder;
+            document.getElementById('step-label').textContent = translations[lang].stepLabel;
+            stepInput.placeholder = translations[lang].stepPlaceholder;
+            addStepBtn.textContent = translations[lang].addButton;
+            closeQuoteBtn.textContent = translations[lang].closeButton;
             
-            // Re-render components with translated text
+            // Re-render steps list if empty
             renderSteps();
+        }
+
+        // Initialize the app
+        function init() {
+            loadState();
+            renderGoal();
+            renderSteps();
+            
+            // Language buttons
+            document.querySelectorAll('.lang-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    updateLanguage(button.dataset.lang);
+                });
+            });
+
+            // ... rest of original event listeners
+            goalInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    saveGoal();
+                }
+            });
+            
+            // ... rest of original init code
+        }
+
+        // Modified showRandomQuote function
+        function showRandomQuote() {
+            const quote = currentQuotes[Math.floor(Math.random() * currentQuotes.length)];
+            quoteContent.textContent = `"${quote.text}"`;
+            quoteAuthor.textContent = `— ${quote.author}`;
+            quoteModal.classList.remove('hidden');
+        }
+
+        // Modified addStep function
+        function addStep() {
+            const stepText = stepInput.value.trim();
+            if (!stepText) return;
+            
+            if (state.steps.filter(step => !step.completed).length >= 5) {
+                alert(translations[currentLang].maxStepsAlert);
+                return;
+            }
+            
+            // ... rest of original addStep code
         }
 
         // Modified renderSteps function
@@ -125,26 +208,17 @@
             if (state.steps.length === 0) {
                 const emptyMsg = document.createElement('div');
                 emptyMsg.className = 'text-center py-4 text-gray-400';
-                emptyMsg.textContent = translations[state.lang].ui.noSteps;
+                emptyMsg.textContent = translations[currentLang].noStepsMessage;
                 stepsContainer.appendChild(emptyMsg);
                 return;
             }
             
-            // ... (rest of renderSteps remains the same)
+            // ... rest of original renderSteps code
         }
 
-        // Modified init function
-        function init() {
-            loadState();
-            applyTranslations(); // Apply translations after loading state
-            renderGoal();
-            renderSteps();
-            
-            // ... (rest of init remains the same)
-        }
-
-        // ... (rest of the JavaScript code remains the same)
-
+        // ... rest of original functions
+        
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
